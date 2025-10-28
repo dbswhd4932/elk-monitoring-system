@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: high-traffic-mastery
+
+  # Week 1-2: 기본 설정 (H2 사용)
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  # Week 3-4: Redis 설정 (초기에는 비활성화)
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  # Week 5-6: Kafka 설정 (초기에는 비활성화)
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: traffic-mastery-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+# Actuator 설정 (모니터링)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+server:
+  port: 8080
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    max-connections: 8192
+    accept-count: 100
+
+logging:
+  level:
+    com.traffic.mastery: DEBUG
+    org.springframework.web: INFO

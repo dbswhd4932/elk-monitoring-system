@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nGrinder 완벽 가이드 - 설치부터 스크립트 작성까지</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        .blog-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .blog-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .blog-header h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .blog-header .meta {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 20px;
+        }
+
+        .blog-header .meta span {
+            margin: 0 15px;
+        }
+
+        .blog-content {
+            padding: 50px 40px;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+
+        .toc h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .toc ol {
+            margin-left: 20px;
+        }
+
+        .toc li {
+            margin: 8px 0;
+            cursor: pointer;
+            color: #495057;
+        }
+
+        .toc li:hover {
+            color: #667eea;
+        }
+
+        .section {
+            margin: 50px 0;
+            scroll-margin-top: 20px;
+        }
+
+        .section h2 {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section h3 {
+            font-size: 24px;
+            color: #34495e;
+            margin: 30px 0 15px 0;
+            font-weight: 600;
+        }
+
+        .section h4 {
+            font-size: 18px;
+            color: #495057;
+            margin: 20px 0 10px 0;
+            font-weight: 600;
+        }
+
+        .section p {
+            margin: 15px 0;
+            line-height: 1.8;
+            color: #495057;
+        }
+
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: attr(data-lang);
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 12px;
+            color: #5c6370;
+            text-transform: uppercase;
+        }
+
+        .code-comment {
+            color: #5c6370;
+        }
+
+        .code-keyword {
+            color: #c678dd;
+        }
+
+        .code-string {
+            color: #98c379;
+        }
+
+        .code-function {
+            color: #61afef;
+        }
+
+        .code-number {
+            color: #d19a66;
+        }
+
+        .highlight-box {
+            background: #fff9e6;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        .highlight-box strong {
+            color: #856404;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        .info-box strong {
+            color: #0c5460;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box strong {
+            color: #856404;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        .success-box strong {
+            color: #155724;
+        }
+
+        .command-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step-container {
+            margin: 30px 0;
+        }
+
+        .step-item {
+            margin: 25px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        thead {
+            background: #667eea;
+            color: white;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafbfc;
+        }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        ul li, ol li {
+            margin: 10px 0;
+            line-height: 1.8;
+        }
+
+        .architecture-diagram {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .arch-box {
+            display: inline-block;
+            padding: 15px 25px;
+            margin: 10px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: #f8f9ff;
+        }
+
+        .arrow {
+            display: inline-block;
+            margin: 0 10px;
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .blog-footer {
+            background: #2c3e50;
+            color: white;
+            padding: 40px;
+            margin-top: 60px;
+        }
+
+        .blog-footer h3 {
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .tag-container {
+            margin: 30px 0;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e9ecef;
+            padding: 6px 15px;
+            margin: 5px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .badge-new {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .badge-important {
+            background: #f39c12;
+            color: white;
+        }
+
+        .comparison-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .comparison-card {
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+        }
+
+        .comparison-card h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .blog-header h1 {
+                font-size: 32px;
+            }
+
+            .blog-content {
+                padding: 30px 20px;
+            }
+
+            .section h2 {
+                font-size: 26px;
+            }
+
+            .comparison-table {
+                grid-template-columns: 1fr;
+            }
+
+            .step-item {
+                flex-direction: column;
+            }
+
+            .step-number {
+                margin-bottom: 10px;
+            }
+        }
+
+        .image-placeholder {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 60px 20px;
+            text-align: center;
+            margin: 25px 0;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="blog-container">
+        <!-- Header -->
+        <div class="blog-header">
+            <h1>🚀 nGrinder 완벽 가이드</h1>
+            <p style="font-size: 20px; margin-top: 15px;">설치부터 스크립트 작성까지 - 성능 테스트의 모든 것</p>
+            <div class="meta">
+                <span>📅 2024년 10월 28일</span>
+                <span>👤 Performance Engineer</span>
+                <span>⏱️ 15분 읽기</span>
+            </div>
+        </div>
+
+        <div class="blog-content">
+            <!-- Introduction -->
+            <div class="section">
+                <p style="font-size: 18px; color: #2c3e50; font-weight: 500;">
+                    웹 애플리케이션의 성능을 측정하고 병목 지점을 찾아내는 것은 서비스 품질을 보장하는 핵심 과정입니다. 
+                    이 글에서는 네이버에서 개발한 오픈소스 성능 테스트 도구인 <strong>nGrinder</strong>를 처음 사용하는 분들도 
+                    쉽게 따라할 수 있도록 자세히 설명하겠습니다.
+                </p>
+            </div>
+
+            <!-- Table of Contents -->
+            <div class="toc">
+                <h3>📑 목차</h3>
+                <ol>
+                    <li><a href="#what-is-ngrinder">nGrinder란 무엇인가?</a></li>
+                    <li><a href="#architecture">아키텍처 이해하기</a></li>
+                    <li><a href="#installation">설치 및 환경 설정</a></li>
+                    <li><a href="#first-test">첫 번째 테스트 실행하기</a></li>
+                    <li><a href="#script-basics">스크립트 작성 기초</a></li>
+                    <li><a href="#advanced-script">고급 스크립트 작성</a></li>
+                    <li><a href="#test-config">테스트 설정 완벽 가이드</a></li>
+                    <li><a href="#result-analysis">결과 분석하기</a></li>
+                    <li><a href="#best-practices">Best Practices</a></li>
+                    <li><a href="#troubleshooting">자주 발생하는 문제 해결</a></li>
+                </ol>
+            </div>
+
+            <!-- Section 1: What is nGrinder -->
+            <div class="section" id="what-is-ngrinder">
+                <h2>1. nGrinder란 무엇인가?</h2>
+                
+                <p>
+                    <strong>nGrinder</strong>는 네이버에서 개발한 오픈소스 성능 테스트 플랫폼입니다. 
+                    The Grinder라는 오픈소스를 기반으로 만들어졌으며, 웹 기반 UI를 통해 쉽게 성능 테스트를 
+                    작성하고 실행할 수 있습니다.
+                </p>
+
+                <h3>주요 특징</h3>
+                <ul>
+                    <li><strong>웹 기반 인터페이스</strong>: 별도의 클라이언트 설치 없이 브라우저에서 모든 작업 수행</li>
+                    <li><strong>스크립트 기반 테스트</strong>: Groovy, Jython, Groovy Maven 프로젝트 지원</li>
+                    <li><strong>분산 테스트</strong>: 여러 에이전트를 통한 대규모 부하 생성 가능</li>
+                    <li><strong>실시간 모니터링</strong>: 테스트 중 TPS, 응답시간 등을 실시간으로 확인</li>
+                    <li><strong>상세한 보고서</strong>: 그래프와 통계를 포함한 테스트 결과 제공</li>
+                </ul>
+
+                <h3>왜 nGrinder를 사용해야 할까?</h3>
+                
+                <div class="comparison-table">
+                    <div class="comparison-card">
+                        <h4>✅ nGrinder의 장점</h4>
+                        <ul>
+                            <li>무료 오픈소스</li>
+                            <li>한글 지원 (네이버 개발)</li>
+                            <li>쉬운 설치 및 설정</li>
+                            <li>스크립트 기반으로 복잡한 시나리오 구현</li>
+                            <li>분산 테스트 지원</li>
+                            <li>SVN 통합</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>⚠️ 고려사항</h4>
+                        <ul>
+                            <li>초기 학습 곡선 존재</li>
+                            <li>Groovy/Jython 스크립트 학습 필요</li>
+                            <li>대규모 테스트 시 에이전트 관리 필요</li>
+                            <li>클라우드 네이티브 환경에서는 추가 설정 필요</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Architecture -->
+            <div class="section" id="architecture">
+                <h2>2. 아키텍처 이해하기</h2>
+                
+                <p>
+                    nGrinder는 크게 <strong>Controller</strong>와 <strong>Agent</strong>로 구성됩니다.
+                </p>
+
+                <div class="architecture-diagram">
+                    <div class="arch-box" style="background: #e3f2fd;">
+                        <strong>👤 사용자</strong><br>
+                        <small>웹 브라우저</small>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="arch-box" style="background: #f3e5f5;">
+                        <strong>🎮 Controller</strong><br>
+                        <small>테스트 관리 & 모니터링</small>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="arch-box" style="background: #e8f5e9;">
+                        <strong>🤖 Agent(s)</strong><br>
+                        <small>부하 생성</small>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="arch-box" style="background: #fff3e0;">
+                        <strong>🎯 Target</strong><br>
+                        <small>테스트 대상 서버</small>
+                    </div>
+                </div>
+
+                <h3>구성 요소 상세</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>구성 요소</th>
+                            <th>역할</th>
+                            <th>포트</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Controller</strong></td>
+                            <td>
+                                • 웹 인터페이스 제공<br>
+                                • 테스트 스크립트 관리<br>
+                                • 에이전트 관리 및 조율<br>
+                                • 테스트 결과 수집 및 표시
+                            </td>
+                            <td>8080, 16001, 12000~12009</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Agent</strong></td>
+                            <td>
+                                • Controller의 지시에 따라 부하 생성<br>
+                                • 여러 프로세스/스레드로 가상 사용자 생성<br>
+                                • 테스트 결과를 Controller에 전송<br>
+                                • 대상 서버에 HTTP 요청 전송
+                            </td>
+                            <td>동적 할당</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Monitor</strong></td>
+                            <td>
+                                • 대상 서버의 리소스 모니터링 (선택사항)<br>
+                                • CPU, Memory, Network 사용량 측정
+                            </td>
+                            <td>13243</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box">
+                    <strong>💡 핵심 개념</strong><br>
+                    <strong>가상 사용자(VUser)</strong> = 에이전트 × 프로세스 × 스레드<br>
+                    예: 에이전트 2개, 프로세스 3개, 스레드 10개 = 총 60명의 가상 사용자
+                </div>
+            </div>
+
+            <!-- Section 3: Installation -->
+            <div class="section" id="installation">
+                <h2>3. 설치 및 환경 설정</h2>
+
+                <h3>3.1 사전 요구사항</h3>
+                <ul>
+                    <li><strong>Java</strong>: JDK 8 이상 (OpenJDK 권장)</li>
+                    <li><strong>메모리</strong>: 최소 4GB RAM (8GB 권장)</li>
+                    <li><strong>OS</strong>: Linux, macOS, Windows 모두 지원</li>
+                </ul>
+
+                <h3>3.2 Docker를 이용한 설치 (권장)</h3>
+                <p>가장 빠르고 간편한 방법은 Docker를 사용하는 것입니다.</p>
+
+                <div class="step-container">
+                    <div class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <strong>Docker Compose 파일 작성</strong>
+                            <div class="code-block" data-lang="yaml">
+version: '3.8'
+
+services:
+  controller:
+    image: ngrinder/controller:latest
+    container_name: ngrinder-controller
+    ports:
+      - "8080:80"        # 웹 인터페이스
+      - "16001:16001"    # Agent 연결 포트
+      - "12000-12009:12000-12009"  # 테스트 포트
+    volumes:
+      - ./ngrinder-controller:/opt/ngrinder-controller
+    environment:
+      - TZ=Asia/Seoul
+    restart: unless-stopped
+
+  agent:
+    image: ngrinder/agent:latest
+    container_name: ngrinder-agent
+    depends_on:
+      - controller
+    environment:
+      - CONTROLLER_ADDR=controller:80
+      - TZ=Asia/Seoul
+    restart: unless-stopped
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <strong>컨테이너 실행</strong>
+                            <div class="command-box">
+$ docker-compose up -d
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <strong>웹 인터페이스 접속</strong>
+                            <p>브라우저에서 <code>http://localhost:8080</code> 접속</p>
+                            <div class="info-box">
+                                <strong>기본 계정</strong><br>
+                                ID: admin<br>
+                                PW: admin
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>3.3 수동 설치</h3>
+
+                <div class="step-container">
+                    <div class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <strong>nGrinder 다운로드</strong>
+                            <div class="command-box">
+# Controller 다운로드
+wget https://github.com/naver/ngrinder/releases/download/ngrinder-3.5.8-release/ngrinder-controller-3.5.8.war
+
+# Agent 다운로드
+wget https://github.com/naver/ngrinder/releases/download/ngrinder-3.5.8-release/ngrinder-agent-3.5.8.tar
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <strong>Controller 실행</strong>
+                            <div class="command-box">
+# WAR 파일 실행
+java -jar ngrinder-controller-3.5.8.war --port 8080
+
+# 또는 Tomcat에 배포
+cp ngrinder-controller-3.5.8.war $TOMCAT_HOME/webapps/ngrinder.war
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <strong>Agent 설정 및 실행</strong>
+                            <div class="code-block" data-lang="bash">
+# Agent 압축 해제
+tar -xvf ngrinder-agent-3.5.8.tar
+
+# __agent.conf 파일 수정
+cd ngrinder-agent
+vi __agent.conf
+
+<span class="code-comment"># 다음 내용 수정</span>
+agent.controller_host=<span class="code-string">localhost</span>
+agent.controller_port=<span class="code-number">80</span>
+
+<span class="code-comment"># Agent 실행</span>
+./run_agent.sh
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ 주의사항</strong><br>
+                    • Controller와 Agent는 네트워크로 통신하므로 방화벽 설정을 확인하세요.<br>
+                    • 포트 16001, 12000-12009가 열려 있어야 합니다.<br>
+                    • Docker 환경에서는 host.docker.internal을 사용하여 호스트 머신에 접근할 수 있습니다.
+                </div>
+            </div>
+
+            <!-- Section 4: First Test -->
+            <div class="section" id="first-test">
+                <h2>4. 첫 번째 테스트 실행하기</h2>
+
+                <p>설치가 완료되었다면 간단한 테스트를 실행해봅시다.</p>
+
+                <div class="step-container">
+                    <div class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <strong>스크립트 생성</strong>
+                            <p>상단 메뉴에서 <code>스크립트 → 스크립트 생성</code> 클릭</p>
+                            <ul>
+                                <li>스크립트 이름: <code>SimpleTest</code></li>
+                                <li>URL: <code>http://example.com</code></li>
+                                <li>생성 버튼 클릭</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <strong>테스트 생성</strong>
+                            <p>상단 메뉴에서 <code>성능 테스트 → 테스트 생성</code> 클릭</p>
+                            <ul>
+                                <li>테스트명: <code>My First Test</code></li>
+                                <li>스크립트: 방금 생성한 <code>SimpleTest</code> 선택</li>
+                                <li>에이전트: 1</li>
+                                <li>가상 사용자: 10</li>
+                                <li>테스트 기간: 1분</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <strong>테스트 실행</strong>
+                            <p><code>저장 후 시작</code> 버튼 클릭</p>
+                            <div class="success-box">
+                                <strong>✅ 축하합니다!</strong><br>
+                                첫 번째 성능 테스트가 실행되고 있습니다. 실시간으로 TPS와 응답 시간을 확인할 수 있습니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 5: Script Basics -->
+            <div class="section" id="script-basics">
+                <h2>5. 스크립트 작성 기초</h2>
+
+                <p>
+                    nGrinder는 Groovy와 Jython 스크립트를 지원합니다. 이 가이드에서는 
+                    더 많이 사용되는 <strong>Groovy</strong>를 중심으로 설명하겠습니다.
+                </p>
+
+                <h3>5.1 기본 스크립트 구조</h3>
+
+                <div class="code-block" data-lang="groovy">
+<span class="code-keyword">import</span> static net.grinder.script.Grinder.grinder
+<span class="code-keyword">import</span> static org.junit.Assert.*
+<span class="code-keyword">import</span> net.grinder.script.GTest
+<span class="code-keyword">import</span> net.grinder.scriptengine.groovy.junit.GrinderRunner
+<span class="code-keyword">import</span> net.grinder.scriptengine.groovy.junit.annotation.*
+<span class="code-keyword">import</span> org.junit.Test
+<span class="code-keyword">import</span> org.junit.runner.RunWith
+<span class="code-keyword">import</span> org.ngrinder.http.HTTPRequest
+<span class="code-keyword">import</span> org.ngrinder.http.HTTPResponse
+
+<span class="code-comment">/**
+ * 기본 성능 테스트 스크립트
+ */</span>
+@RunWith(GrinderRunner)
+<span class="code-keyword">class</span> <span class="code-function">BasicTest</span> {
+    
+    <span class="code-comment">// 전역 변수 (모든 스레드가 공유)</span>
+    <span class="code-keyword">public static</span> GTest test
+    <span class="code-keyword">public static</span> HTTPRequest request
+    
+    <span class="code-comment">/**
+     * @BeforeProcess: 프로세스 시작 시 1회 실행
+     * 모든 스레드가 공유할 리소스 초기화
+     */</span>
+    @BeforeProcess
+    <span class="code-keyword">public static void</span> <span class="code-function">beforeProcess</span>() {
+        <span class="code-comment">// 테스트 객체 생성 (테스트 번호, 테스트 이름)</span>
+        test = <span class="code-keyword">new</span> GTest(<span class="code-number">1</span>, <span class="code-string">"API Test"</span>)
+        
+        <span class="code-comment">// HTTP 요청 객체 생성</span>
+        request = <span class="code-keyword">new</span> HTTPRequest()
+        
+        <span class="code-comment">// 로깅</span>
+        grinder.logger.info(<span class="code-string">"=== Process Started ==="</span>)
+    }
+    
+    <span class="code-comment">/**
+     * @BeforeThread: 각 스레드 시작 시 1회 실행
+     * 스레드별 초기화 작업 수행
+     */</span>
+    @BeforeThread
+    <span class="code-keyword">public void</span> <span class="code-function">beforeThread</span>() {
+        <span class="code-comment">// 테스트 메서드를 Grinder에 등록</span>
+        test.record(<span class="code-keyword">this</span>, <span class="code-string">"testAPI"</span>)
+        
+        <span class="code-comment">// 통계 보고 지연 설정</span>
+        grinder.statistics.delayReports = <span class="code-keyword">true</span>
+        
+        grinder.logger.info(<span class="code-string">"=== Thread Started ==="</span>)
+    }
+    
+    <span class="code-comment">/**
+     * @Before: 각 테스트 실행 전 호출
+     * 테스트마다 공통으로 필요한 설정
+     */</span>
+    @Before
+    <span class="code-keyword">public void</span> <span class="code-function">before</span>() {
+        <span class="code-comment">// 헤더 설정 등</span>
+    }
+    
+    <span class="code-comment">/**
+     * @Test: 실제 테스트 로직
+     * 각 가상 사용자가 반복적으로 실행
+     */</span>
+    @Test
+    <span class="code-keyword">public void</span> <span class="code-function">testAPI</span>() {
+        <span class="code-comment">// API 호출</span>
+        HTTPResponse response = request.GET(<span class="code-string">"https://api.example.com/users"</span>)
+        
+        <span class="code-comment">// 응답 검증</span>
+        assertThat(response.statusCode, is(<span class="code-number">200</span>))
+    }
+    
+    <span class="code-comment">/**
+     * @After: 각 테스트 실행 후 호출
+     */</span>
+    @After
+    <span class="code-keyword">public void</span> <span class="code-function">after</span>() {
+        <span class="code-comment">// 정리 작업</span>
+    }
+    
+    <span class="code-comment">/**
+     * @AfterThread: 각 스레드 종료 시 1회 실행
+     */</span>
+    @AfterThread
+    <span class="code-keyword">public void</span> <span class="code-function">afterThread</span>() {
+        grinder.logger.info(<span class="code-string">"=== Thread Finished ==="</span>)
+    }
+    
+    <span class="code-comment">/**
+     * @AfterProcess: 프로세스 종료 시 1회 실행
+     */</span>
+    @AfterProcess
+    <span class="code-keyword">public static void</span> <span class="code-function">afterProcess</span>() {
+        grinder.logger.info(<span class="code-string">"=== Process Finished ==="</span>)
+    }
+}
+                </div>
+
+                <h3>5.2 실행 순서 이해하기</h3>
+
+                <div class="info-box">
+                    <strong>📊 스크립트 실행 흐름</strong><br><br>
+                    <code>@BeforeProcess</code> (1회) <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;└─ <code>@BeforeThread</code> (스레드당 1회)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ <code>@Before</code> (매 반복마다)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ <code>@Test</code> (매 반복마다)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ <code>@After</code> (매 반복마다)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;└─ <code>@AfterThread</code> (스레드당 1회)<br>
+                    └─ <code>@AfterProcess</code> (1회)
+                </div>
+
+                <h3>5.3 HTTP 요청 메서드</h3>
+
+                <div class="code-block" data-lang="groovy">
+<span class="code-comment">// GET 요청</span>
+HTTPResponse response = request.GET(<span class="code-string">"https://api.example.com/users"</span>)
+
+<span class="code-comment">// GET with Query Parameters</span>
+response = request.GET(<span class="code-string">"https://api.example.com/users"</span>, [
+    [<span class="code-string">"page"</span>, <span class="code-string">"1"</span>],
+    [<span class="code-string">"size"</span>, <span class="code-string">"10"</span>]
+])
+
+<span class="code-comment">// POST 요청</span>
+<span class="code-keyword">def</span> body = <span class="code-string">'{"name":"John", "email":"john@example.com"}'</span>
+response = request.POST(<span class="code-string">"https://api.example.com/users"</span>, body)
+
+<span class="code-comment">// PUT 요청</span>
+response = request.PUT(<span class="code-string">"https://api.example.com/users/1"</span>, body)
+
+<span class="code-comment">// DELETE 요청</span>
+response = request.DELETE(<span class="code-string">"https://api.example.com/users/1"</span>)
+
+<span class="code-comment">// 헤더 설정</span>
+request.setHeaders([
+    <span class="code-string">"Content-Type"</span>: <span class="code-string">"application/json"</span>,
+    <span class="code-string">"Authorization"</span>: <span class="code-string">"Bearer token123"</span>
+])
+                </div>
+
+                <h3>5.4 응답 검증</h3>
+
+                <div class="code-block" data-lang="groovy">
+<span class="code-keyword">import</span> static org.hamcrest.Matchers.*
+
+@Test
+<span class="code-keyword">public void</span> <span class="code-function">testWithValidation</span>() {
+    HTTPResponse response = request.GET(<span class="code-string">"https://api.example.com/users/1"</span>)
+    
+    <span class="code-comment">// 상태 코드 검증</span>
+    assertThat(response.statusCode, is(<span class="code-number">200</span>))
+    
+    <span class="code-comment">// 응답 본문 검증</span>
+    <span class="code-keyword">def</span> body = response.getText()
+    assertThat(body, containsString(<span class="code-string">"John"</span>))
+    
+    <span class="code-comment">// JSON 파싱 후 검증</span>
+    <span class="code-keyword">def</span> json = <span class="code-keyword">new</span> groovy.json.JsonSlurper().parseText(body)
+    assertThat(json.name, is(<span class="code-string">"John"</span>))
+    assertThat(json.email, is(<span class="code-string">"john@example.com"</span>))
+    
+    <span class="code-comment">// 응답 시간 검증</span>
+    <span class="code-keyword">if</span> (response.getTime() > <span class="code-number">1000</span>) {
+        grinder.logger.warn(<span class="code-string">"Response time is too slow: ${response.getTime()}ms"</span>)
+    }
+}
+                </div>
+            </div>
+
+            <!-- Section 6: Advanced Script -->
+            <div class="section" id="advanced-script">
+                <h2>6. 고급 스크립트 작성</h2>
+
+                <h3>6.1 랜덤 데이터 생성</h3>
+
+                <div class="code-block" data-lang="groovy">
+<span class="code-keyword">import</span> java.util.Random
+
+<span class="code-keyword">class</span> <span class="code-function">AdvancedTest</span> {
+    <span class="code-keyword">private static</span> Random random = <span class="code-keyword">new</span> Random()
+    
+    @Test
+    <span class="code-keyword">public void</span> <span class="code-function">testWithRandomData</span>() {
+        <span class="code-comment">// 랜덤 숫자 생성 (1~100)</span>
+        <span class="code-keyword">def</span> userId = random.nextInt(<span class="code-number">100</span>) + <span class="code-number">1</span>
+        
+        <span class="code-comment">// 랜덤 문자열 생성</span>
+        <span class="code-keyword">def</span> randomString = UUID.randomUUID().toString()
+        
+        <span class="code-comment">// API 호출</span>
+        HTTPResponse response = request.GET(
+            <span class="code-string">"https://api.example.com/users/${userId}"</span>
+        )
+        
+        grinder.logger.info(<span class="code-string">"Testing user ID: ${userId}"</span>)
+    }
+}
+                </div>
+
+                <h3>6.2 CSV 파일에서 데이터 읽기</h3>
+
+                <div class="code-block" data-lang="groovy">
+<span class="code-keyword">import</span> static net.grinder.util.GrinderUtils.getFileFromPath
+
+<span class="code-keyword">class</span> <span class="code-function">CSVTest</span> {
+    <span class="code-keyword">private static</span> List&lt;String[]&gt; dataList
+    <span class="code-keyword">private static</span> <span class="code-keyword">int</span> dataIndex = <span class="code-number">0</span>
+    
+    @BeforeProcess
+    <span class="code-keyword">public static void</span> <span class="code-function">beforeProcess</span>() {
+        <span class="code-comment">// CSV 파일 읽기</span>
+        <span class="code-keyword">def</span> file = getFileFromPath(<span class="code-string">"test_data.csv"</span>)
+        dataList = file.readLines().collect { it.split(<span class="code-string">","</span>) }
+        
+        <span class="code-comment">// 헤더 제거</span>
+        dataList.remove(<span class="code-number">0</span>)
+        
+        grinder.logger.info(<span class="code-string">"Loaded ${dataList.size()} rows from CSV"</span>)
+    }
+    
+    @Test
+    <span class="code-keyword">public void</span> <span class="code-function">testWithCSVData</span>() {
+        <span class="code-comment">// 순차적으로 데이터 가져오기</span>
+        <span class="code-keyword">def</span> data = dataList[dataIndex++ % dataList.size()]
+        <span class="code-keyword">def</span> username = data[<span class="code-number">0</span>]
+        <span class="code-keyword">def</span> email = data[<span class="code-number">1</span>]
+        
+        <span class="code-comment">// 요청 본문 생성</span>
+        <span class="code-keyword">def</span> body = <span class="code-string">"""
+        {
+            "username": "${username}",
+            "email": "${email}"
+        }
+        """</span>
+        
+        <span class="code-comment">// POST 요청</span>
+        HTTPResponse response = request.POST(
+            <span class="code-string">"https://api.example.com/users"</span>, 
+            body
+        )
+        
+        assertThat(response.statusCode, is(<span class="code-number">201</span>))
+    }
+}
+                </div>
+
+                <h3>6.3 쿠키 및 세션 관리</h3>
+
+                <div class="code-block" data-lang="groovy">
+<span class="code-keyword">import</span> org.ngrinder.http.cookie.CookieManager
+<span class="code-keyword">import</span> org.ngrinder.http.cookie.Cookie
+
+<span class="code-keyword">class</span> <span class="code-function">SessionTest</span> {
+    <span class="code-keyword">private</span> CookieManager cookieManager
+    
+    @BeforeThread
+    <span class="code-keyword">public void</span> <span class="code-function">beforeThread</span>() {
+        cookieManager = <span class="code-keyword">new</span> CookieManager()
+        request.setCookieManager(cookieManager)
+    }
+    
+    @Test
+    <span class="code-keyword">public void</span> <span class="code-function">testWithLogin</span>() {
+        <span class="code-comment">// 1. 로그인</span>
+        <span class="code-keyword">def</span> loginBody = <span class="code-string">'{"username":"test","password":"test123"}'</span>
+        HTTPResponse loginResponse = request.POST(
+            <span class="code-string">"https://api.example.com/auth/login"</span>,
+            loginBody
+        )
+        
+        <span class="code-comment">// 쿠키 자동 저장됨</span>
+        grinder.logger.info(<span class="code-string">"Cookies: ${cookieManager.allCookies}"</span>)
+        
+        <span class="code-comment">// 2. 인증이 필요한 API 호출 (자동으로 쿠키 전송)</span>
+        HTTPResponse response = request.GET(
+            <span class="code-string">"https://api.example.com/profile"</span>
+        )
+        
+        assertThat(response.statusCode, is(<span class="code-number">200</span>))
+    }
+}
+                </div>
+
+                <h3>6.4 조건부 테스트 시나리오</h3>
+
+                <div class="code-block" data-lang="groovy">
+<span class="code-keyword">class</span> <span class="code-function">ConditionalTest</span> {
+    <span class="code-keyword">private static</span> Random random = <span class="code-keyword">new</span> Random()
+    
+    @Test
+    <span class="code-keyword">public void</span> <span class="code-function">testMixedScenario</span>() {
+        <span class="code-comment">// 70% GET, 20% POST, 10% DELETE</span>
+        <span class="code-keyword">def</span> scenario = random.nextInt(<span class="code-number">100</span>)
+        
+        <span class="code-keyword">if</span> (scenario < <span class="code-number">70</span>) {
+            <span class="code-comment">// 조회 (70%)</span>
+            <span class="code-keyword">def</span> userId = random.nextInt(<span class="code-number">100</span>) + <span class="code-number">1</span>
+            HTTPResponse response = request.GET(
+                <span class="code-string">"https://api.example.com/users/${userId}"</span>
+            )
+            assertThat(response.statusCode, is(<span class="code-number">200</span>))
+            
+        } <span class="code-keyword">else if</span> (scenario < <span class="code-number">90</span>) {
+            <span class="code-comment">// 생성 (20%)</span>
+            <span class="code-keyword">def</span> body = <span class="code-string">'{"name":"NewUser","email":"new@example.com"}'</span>
+            HTTPResponse response = request.POST(
+                <span class="code-string">"https://api.example.com/users"</span>,
+                body
+            )
+            assertThat(response.statusCode, is(<span class="code-number">201</span>))
+            
+        } <span class="code-keyword">else</span> {
+            <span class="code-comment">// 삭제 (10%)</span>
+            <span class="code-keyword">def</span> userId = random.nextInt(<span class="code-number">100</span>) + <span class="code-number">1</span>
+            HTTPResponse response = request.DELETE(
+                <span class="code-string">"https://api.example.com/users/${userId}"</span>
+            )
+            assertThat(response.statusCode, anyOf(is(<span class="code-number">200</span>), is(<span class="code-number">204</span>)))
+        }
+    }
+}
+                </div>
+
+                <h3>6.5 Spring Boot + JPA 애플리케이션 테스트 (실전 예제)</h3>
+
+                <div class="code-block" data-lang="groovy">
+<span class="code-keyword">import</span> static net.grinder.script.Grinder.grinder
+<span class="code-keyword">import</span> static org.junit.Assert.*
+<span class="code-keyword">import</span> static org.hamcrest.Matchers.*
+<span class="code-keyword">import</span> net.grinder.script.GTest
+<span class="code-keyword">import</span> net.grinder.scriptengine.groovy.junit.GrinderRunner
+<span class="code-keyword">import</span> net.grinder.scriptengine.groovy.junit.annotation.*
+<span class="code-keyword">import</span> org.junit.Test
+<span class="code-keyword">import</span> org.junit.runner.RunWith
+<span class="code-keyword">import</span> org.ngrinder.http.HTTPRequest
+<span class="code-keyword">import</span> org.ngrinder.http.HTTPResponse
+
+<span class="code-comment">/**
+ * Spring Boot REST API 성능 테스트
+ * - 상품 조회 API 테스트
+ * - JPA N+1 문제 검증
+ * - 응답 시간 모니터링
+ */</span>
+@RunWith(GrinderRunner)
+<span class="code-keyword">class</span> <span class="code-function">ProductAPITest</span> {
+    
+    <span class="code-keyword">public static</span> GTest test
+    <span class="code-keyword">public static</span> HTTPRequest request
+    <span class="code-keyword">public static</span> Map&lt;String, String&gt; headers = [:]
+    
+    <span class="code-comment">// 테스트 통계</span>
+    <span class="code-keyword">private static</span> <span class="code-keyword">int</span> slowQueryCount = <span class="code-number">0</span>
+    <span class="code-keyword">private static</span> <span class="code-keyword">int</span> totalRequests = <span class="code-number">0</span>
+    
+    @BeforeProcess
+    <span class="code-keyword">public static void</span> <span class="code-function">beforeProcess</span>() {
+        <span class="code-comment">// HTTP 타임아웃 설정 (5분)</span>
+        HTTPRequestControl.setConnectionTimeout(<span class="code-number">300000</span>)
+        
+        test = <span class="code-keyword">new</span> GTest(<span class="code-number">1</span>, <span class="code-string">"Product API Test"</span>)
+        request = <span class="code-keyword">new</span> HTTPRequest()
+        
+        <span class="code-comment">// 공통 헤더 설정</span>
+        headers[<span class="code-string">"Content-Type"</span>] = <span class="code-string">"application/json"</span>
+        headers[<span class="code-string">"Accept"</span>] = <span class="code-string">"application/json"</span>
+        
+        grinder.logger.info(<span class="code-string">"=== Test Process Started ==="</span>)
+    }
+    
+    @BeforeThread
+    <span class="code-keyword">public void</span> <span class="code-function">beforeThread</span>() {
+        test.record(<span class="code-keyword">this</span>, <span class="code-string">"testGetProduct"</span>)
+        grinder.statistics.delayReports = <span class="code-keyword">true</span>
+        grinder.logger.info(<span class="code-string">"=== Thread ${grinder.threadNumber} Started ==="</span>)
+    }
+    
+    @Before
+    <span class="code-keyword">public void</span> <span class="code-function">before</span>() {
+        request.setHeaders(headers)
+    }
+    
+    @Test
+    <span class="code-keyword">public void</span> <span class="code-function">testGetProduct</span>() {
+        <span class="code-comment">// 랜덤 상품 ID (1~100)</span>
+        <span class="code-keyword">def</span> productId = (<span class="code-keyword">new</span> Random().nextInt(<span class="code-number">100</span>) + <span class="code-number">1</span>)
+        
+        <span class="code-comment">// 요청 시작 시간</span>
+        <span class="code-keyword">def</span> startTime = System.currentTimeMillis()
+        
+        <span class="code-comment">// API 호출 (Docker 환경에서 호스트 머신 접근)</span>
+        HTTPResponse response = request.GET(
+            <span class="code-string">"http://host.docker.internal:8080/api/v1/products/${productId}"</span>
+        )
+        
+        <span class="code-comment">// 응답 시간 계산</span>
+        <span class="code-keyword">def</span> responseTime = System.currentTimeMillis() - startTime
+        totalRequests++
+        
+        <span class="code-comment">// 응답 코드 검증</span>
+        <span class="code-keyword">if</span> (response.statusCode == <span class="code-number">301</span> || response.statusCode == <span class="code-number">302</span>) {
+            grinder.logger.warn(<span class="code-string">"Redirect detected: ${response.statusCode}"</span>)
+        } <span class="code-keyword">else</span> {
+            assertThat(response.statusCode, is(<span class="code-number">200</span>))
+        }
+        
+        <span class="code-comment">// 응답 본문 파싱 (선택적)</span>
+        <span class="code-keyword">try</span> {
+            <span class="code-keyword">def</span> json = <span class="code-keyword">new</span> groovy.json.JsonSlurper().parseText(response.getText())
+            
+            <span class="code-comment">// 필수 필드 검증</span>
+            assertThat(json.id, notNullValue())
+            assertThat(json.name, notNullValue())
+            
+        } <span class="code-keyword">catch</span> (Exception e) {
+            grinder.logger.error(<span class="code-string">"JSON Parse Error: ${e.message}"</span>)
+        }
+        
+        <span class="code-comment">// 느린 쿼리 감지 (1초 이상)</span>
+        <span class="code-keyword">if</span> (responseTime > <span class="code-number">1000</span>) {
+            slowQueryCount++
+            grinder.logger.warn(
+                <span class="code-string">"Slow Query Detected - Product ID: ${productId}, "</span> +
+                <span class="code-string">"Time: ${responseTime}ms"</span>
+            )
+        }
+        
+        <span class="code-comment">// 100개 요청마다 통계 출력</span>
+        <span class="code-keyword">if</span> (totalRequests % <span class="code-number">100</span> == <span class="code-number">0</span>) {
+            <span class="code-keyword">def</span> slowPercentage = (slowQueryCount / totalRequests * <span class="code-number">100</span>).round(<span class="code-number">2</span>)
+            grinder.logger.info(
+                <span class="code-string">"Stats - Total: ${totalRequests}, "</span> +
+                <span class="code-string">"Slow: ${slowQueryCount} (${slowPercentage}%)"</span>
+            )
+        }
+    }
+    
+    @AfterThread
+    <span class="code-keyword">public void</span> <span class="code-function">afterThread</span>() {
+        grinder.logger.info(<span class="code-string">"=== Thread ${grinder.threadNumber} Finished ==="</span>)
+    }
+    
+    @AfterProcess
+    <span class="code-keyword">public static void</span> <span class="code-function">afterProcess</span>() {
+        grinder.logger.info(<span class="code-string">"=== Final Stats ==="</span>)
+        grinder.logger.info(<span class="code-string">"Total Requests: ${totalRequests}"</span>)
+        grinder.logger.info(<span class="code-string">"Slow Queries: ${slowQueryCount}"</span>)
+        
+        <span class="code-keyword">if</span> (totalRequests > <span class="code-number">0</span>) {
+            <span class="code-keyword">def</span> slowPercentage = (slowQueryCount / totalRequests * <span class="code-number">100</span>).round(<span class="code-number">2</span>)
+            grinder.logger.info(<span class="code-string">"Slow Query Ratio: ${slowPercentage}%"</span>)
+        }
+    }
+}
+                </div>
+            </div>
+
+            <!-- Section 7: Test Configuration -->
+            <div class="section" id="test-config">
+                <h2>7. 테스트 설정 완벽 가이드</h2>
+
+                <h3>7.1 기본 설정 항목</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>항목</th>
+                            <th>설명</th>
+                            <th>권장값</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>에이전트</strong></td>
+                            <td>테스트를 실행할 물리적 머신 수</td>
+                            <td>1~10 (부하에 따라 조정)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>가상 사용자</strong></td>
+                            <td>동시 접속 사용자 수 (총 스레드 수)</td>
+                            <td>100~1000</td>
+                        </tr>
+                        <tr>
+                            <td><strong>프로세스</strong></td>
+                            <td>에이전트당 생성할 JVM 프로세스 수</td>
+                            <td>2~4</td>
+                        </tr>
+                        <tr>
+                            <td><strong>스레드</strong></td>
+                            <td>프로세스당 생성할 스레드 수</td>
+                            <td>50~100</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="highlight-box">
+                    <strong>💡 설정 팁</strong><br>
+                    • 가상 사용자 = 에이전트 × 프로세스 × 스레드<br>
+                    • 프로세스를 여러 개로 나누면 GC 영향을 분산시킬 수 있습니다<br>
+                    • 스레드당 메모리를 고려하여 적절히 배분하세요
+                </div>
+
+                <h3>7.2 Ramp-Up 설정</h3>
+
+                <p>
+                    Ramp-Up은 가상 사용자를 점진적으로 증가시켜 시스템에 급격한 부하를 주지 않고 
+                    안정적으로 테스트하는 기능입니다.
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>설정</th>
+                            <th>설명</th>
+                            <th>예시</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>초기 개수</strong></td>
+                            <td>테스트 시작 시 가상 사용자 수</td>
+                            <td>0 또는 10</td>
+                        </tr>
+                        <tr>
+                            <td><strong>증가 단위</strong></td>
+                            <td>한 번에 증가시킬 사용자 수</td>
+                            <td>1~10</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ramp-Up 주기</strong></td>
+                            <td>증가 간격 (밀리초)</td>
+                            <td>1000 (1초)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box">
+                    <strong>📈 Ramp-Up 시나리오 예시</strong><br><br>
+                    <strong>시나리오:</strong> 0명 → 100명 (10명씩 증가)<br>
+                    • 초기 개수: 0<br>
+                    • 증가 단위: 10<br>
+                    • Ramp-Up 주기: 5000ms (5초)<br>
+                    • 결과: 총 50초에 걸쳐 100명까지 증가
+                </div>
+
+                <h3>7.3 테스트 실행 방식</h3>
+
+                <div class="comparison-table">
+                    <div class="comparison-card">
+                        <h4>⏱️ 테스트 기간</h4>
+                        <p>지정된 시간 동안 테스트를 실행합니다.</p>
+                        <ul>
+                            <li>예: 2분, 10분, 1시간</li>
+                            <li>Endurance 테스트에 적합</li>
+                            <li>시간이 끝나면 자동 종료</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card">
+                        <h4>🔄 실행 횟수</h4>
+                        <p>각 스레드가 실행할 총 횟수를 지정합니다.</p>
+                        <ul>
+                            <li>예: 1000회, 10000회</li>
+                            <li>정확한 요청 수가 중요한 경우</li>
+                            <li>모든 스레드가 완료되면 종료</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>7.4 최적의 설정 찾기</h3>
+
+                <div class="step-container">
+                    <div class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <strong>Baseline 테스트</strong>
+                            <p>소수의 사용자(10~50명)로 시작하여 시스템의 기본 성능을 측정합니다.</p>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <strong>부하 증가 테스트</strong>
+                            <p>점진적으로 사용자 수를 늘려가며 시스템의 한계점을 찾습니다.</p>
+                            <ul>
+                                <li>50명 → 100명 → 200명 → 500명</li>
+                                <li>TPS와 응답시간을 관찰</li>
+                                <li>에러가 발생하는 지점 파악</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <strong>안정성 테스트</strong>
+                            <p>목표 부하로 장시간(30분~1시간) 테스트하여 안정성을 검증합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 8: Result Analysis -->
+            <div class="section" id="result-analysis">
+                <h2>8. 결과 분석하기</h2>
+
+                <h3>8.1 주요 성능 지표</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>지표</th>
+                            <th>의미</th>
+                            <th>좋은 값</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>TPS</strong><br>(Transactions Per Second)</td>
+                            <td>초당 처리한 트랜잭션 수<br>시스템의 처리량을 나타냄</td>
+                            <td>높을수록 좋음<br>안정적일수록 좋음</td>
+                        </tr>
+                        <tr>
+                            <td><strong>평균 응답시간</strong></td>
+                            <td>요청부터 응답까지 걸린 평균 시간</td>
+                            <td>
+                                • API: < 200ms<br>
+                                • 웹페이지: < 1s<br>
+                                • 복잡한 조회: < 3s
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>에러율</strong></td>
+                            <td>전체 요청 중 실패한 요청의 비율</td>
+                            <td>< 0.1% (거의 0에 가까워야 함)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>총 실행 테스트</strong></td>
+                            <td>테스트 기간 동안 실행된 총 요청 수</td>
+                            <td>충분한 샘플 확보 (> 1000)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>최고 TPS</strong></td>
+                            <td>피크 시점의 최대 처리량</td>
+                            <td>평균 TPS의 1.2~1.5배</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>8.2 그래프 해석</h3>
+
+                <h4>TPS 그래프 패턴</h4>
+
+                <div class="highlight-box">
+                    <strong>✅ 좋은 패턴</strong><br>
+                    • 일정한 수평선: 안정적인 처리량<br>
+                    • 완만한 증가: 시스템이 부하를 잘 처리<br>
+                    • 작은 변동: 정상적인 범위의 흔들림
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ 나쁜 패턴</strong><br>
+                    • 급격한 하락: 시스템 병목, GC, DB 문제<br>
+                    • 톱니 모양: 불안정한 시스템<br>
+                    • 지속적인 하락: 메모리 누수 또는 리소스 고갈
+                </div>
+
+                <h3>8.3 문제 진단 가이드</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>증상</th>
+                            <th>가능한 원인</th>
+                            <th>해결 방안</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>높은 응답시간<br>(> 1초)</td>
+                            <td>
+                                • 느린 DB 쿼리<br>
+                                • N+1 문제<br>
+                                • 외부 API 지연
+                            </td>
+                            <td>
+                                • 쿼리 최적화<br>
+                                • EntityGraph 사용<br>
+                                • 캐싱 적용
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TPS 급락</td>
+                            <td>
+                                • GC 발생<br>
+                                • Connection Pool 고갈<br>
+                                • CPU 100%
+                            </td>
+                            <td>
+                                • Heap 크기 조정<br>
+                                • Connection Pool 증가<br>
+                                • 애플리케이션 스케일아웃
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>높은 에러율</td>
+                            <td>
+                                • 타임아웃<br>
+                                • 500 에러<br>
+                                • Connection refused
+                            </td>
+                            <td>
+                                • 타임아웃 설정 조정<br>
+                                • 애플리케이션 로그 확인<br>
+                                • 인프라 리소스 증설
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>8.4 실전 분석 예시</h3>
+
+                <div class="code-block" data-lang="text">
+<span class="code-comment"># 테스트 결과 샘플</span>
+총 Vuser: <span class="code-number">99</span>
+TPS: <span class="code-number">187.8</span>
+최고 TPS: <span class="code-number">225.0</span>
+평균 응답시간: <span class="code-number">533.31</span> ms
+에러: <span class="code-number">0</span>
+
+<span class="code-comment"># 분석</span>
+<span class="code-string">✅ 긍정적 지표:</span>
+- 0% 에러율로 안정적
+- 187.8 TPS로 충분한 처리량
+- 평균 응답시간 533ms (목표 1초 이내)
+
+<span class="code-string">⚠️ 개선 포인트:</span>
+- 응답시간 300ms 이하로 개선 필요
+- TPS 그래프에서 일부 변동 발견
+- 00:24 구간 급락 원인 분석 필요
+
+<span class="code-string">📋 액션 아이템:</span>
+1. 애플리케이션 로그 확인
+2. GC 로그 분석
+3. DB 슬로우 쿼리 검토
+4. 캐싱 전략 수립
+                </div>
+            </div>
+
+            <!-- Section 9: Best Practices -->
+            <div class="section" id="best-practices">
+                <h2>9. Best Practices</h2>
+
+                <h3>9.1 스크립트 작성</h3>
+
+                <ul>
+                    <li><strong>한 스크립트에 하나의 시나리오</strong>: 스크립트를 작고 명확하게 유지</li>
+                    <li><strong>적절한 로깅</strong>: 디버깅을 위해 중요한 정보만 로깅</li>
+                    <li><strong>에러 처리</strong>: try-catch로 예외 처리하여 테스트 안정성 확보</li>
+                    <li><strong>데이터 격리</strong>: 테스트 데이터가 서로 영향을 주지 않도록 설계</li>
+                    <li><strong>응답 검증</strong>: 단순히 상태 코드만 확인하지 말고 응답 내용도 검증</li>
+                </ul>
+
+                <div class="code-block" data-lang="groovy">
+<span class="code-comment">// ❌ 나쁜 예 - 너무 많은 로깅</span>
+@Test
+<span class="code-keyword">public void</span> <span class="code-function">badTest</span>() {
+    grinder.logger.info(<span class="code-string">"Starting test"</span>)
+    grinder.logger.info(<span class="code-string">"Making request"</span>)
+    <span class="code-keyword">def</span> response = request.GET(url)
+    grinder.logger.info(<span class="code-string">"Got response: ${response.getText()}"</span>)
+    grinder.logger.info(<span class="code-string">"Test completed"</span>)
+}
+
+<span class="code-comment">// ✅ 좋은 예 - 필요한 정보만 로깅</span>
+@Test
+<span class="code-keyword">public void</span> <span class="code-function">goodTest</span>() {
+    <span class="code-keyword">try</span> {
+        <span class="code-keyword">def</span> response = request.GET(url)
+        
+        <span class="code-keyword">if</span> (response.statusCode != <span class="code-number">200</span>) {
+            grinder.logger.warn(<span class="code-string">"Unexpected status: ${response.statusCode}"</span>)
+        }
+        
+        assertThat(response.statusCode, is(<span class="code-number">200</span>))
+        
+    } <span class="code-keyword">catch</span> (Exception e) {
+        grinder.logger.error(<span class="code-string">"Test failed: ${e.message}"</span>)
+        <span class="code-keyword">throw</span> e
+    }
+}
+                </div>
+
+                <h3>9.2 테스트 설계</h3>
+
+                <ul>
+                    <li><strong>점진적 접근</strong>: 작은 부하부터 시작하여 점차 증가</li>
+                    <li><strong>현실적인 시나리오</strong>: 실제 사용자 행동을 모방</li>
+                    <li><strong>충분한 Warm-up</strong>: 시스템이 안정화될 시간 제공</li>
+                    <li><strong>반복 테스트</strong>: 일회성이 아닌 반복 테스트로 신뢰성 확보</li>
+                    <li><strong>프로덕션과 동일한 환경</strong>: 가능한 한 운영 환경과 유사하게 구성</li>
+                </ul>
+
+                <h3>9.3 모니터링</h3>
+
+                <div class="info-box">
+                    <strong>📊 동시 모니터링 권장 항목</strong><br><br>
+                    <strong>애플리케이션:</strong><br>
+                    • GC 시간 및 빈도<br>
+                    • Heap 메모리 사용량<br>
+                    • Thread Pool 상태<br>
+                    • Connection Pool 사용률<br><br>
+                    
+                    <strong>데이터베이스:</strong><br>
+                    • 활성 커넥션 수<br>
+                    • 슬로우 쿼리 로그<br>
+                    • Lock 대기 시간<br>
+                    • 캐시 히트율<br><br>
+                    
+                    <strong>인프라:</strong><br>
+                    • CPU 사용률<br>
+                    • 메모리 사용률<br>
+                    • 네트워크 I/O<br>
+                    • 디스크 I/O
+                </div>
+
+                <h3>9.4 Spring Boot + JPA 최적화 체크리스트</h3>
+
+                <div class="code-block" data-lang="properties">
+<span class="code-comment"># 1. HikariCP 설정 최적화</span>
+spring.datasource.hikari.maximum-pool-size=<span class="code-number">20</span>
+spring.datasource.hikari.minimum-idle=<span class="code-number">10</span>
+spring.datasource.hikari.connection-timeout=<span class="code-number">30000</span>
+spring.datasource.hikari.idle-timeout=<span class="code-number">600000</span>
+spring.datasource.hikari.max-lifetime=<span class="code-number">1800000</span>
+
+<span class="code-comment"># 2. JPA 배치 처리</span>
+spring.jpa.properties.hibernate.jdbc.batch_size=<span class="code-number">50</span>
+spring.jpa.properties.hibernate.order_inserts=<span class="code-keyword">true</span>
+spring.jpa.properties.hibernate.order_updates=<span class="code-keyword">true</span>
+
+<span class="code-comment"># 3. 2차 캐시 활성화</span>
+spring.jpa.properties.hibernate.cache.use_second_level_cache=<span class="code-keyword">true</span>
+spring.jpa.properties.hibernate.cache.region.factory_class=org.hibernate.cache.jcache.JCacheRegionFactory
+
+<span class="code-comment"># 4. 쿼리 로깅 (개발 환경)</span>
+spring.jpa.show-sql=<span class="code-keyword">true</span>
+spring.jpa.properties.hibernate.format_sql=<span class="code-keyword">true</span>
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder=<span class="code-string">TRACE</span>
+                </div>
+
+                <div class="code-block" data-lang="java">
+<span class="code-comment">// N+1 문제 해결</span>
+
+<span class="code-comment">// ❌ 나쁜 예 - N+1 발생</span>
+@GetMapping(<span class="code-string">"/products"</span>)
+<span class="code-keyword">public</span> List&lt;ProductDto&gt; <span class="code-function">getProducts</span>() {
+    <span class="code-keyword">return</span> productRepository.findAll()
+        .stream()
+        .map(ProductDto::<span class="code-keyword">new</span>)
+        .collect(Collectors.toList());
+}
+
+<span class="code-comment">// ✅ 좋은 예 - EntityGraph 사용</span>
+<span class="code-keyword">public interface</span> <span class="code-function">ProductRepository</span> <span class="code-keyword">extends</span> JpaRepository&lt;Product, Long&gt; {
+    
+    @EntityGraph(attributePaths = {<span class="code-string">"category"</span>, <span class="code-string">"supplier"</span>})
+    List&lt;Product&gt; <span class="code-function">findAll</span>();
+    
+    <span class="code-comment">// 또는 Fetch Join 사용</span>
+    @Query(<span class="code-string">"SELECT p FROM Product p JOIN FETCH p.category JOIN FETCH p.supplier"</span>)
+    List&lt;Product&gt; <span class="code-function">findAllWithRelations</span>();
+}
+
+<span class="code-comment">// 캐싱 적용</span>
+@Service
+<span class="code-keyword">public class</span> <span class="code-function">ProductService</span> {
+    
+    @Cacheable(value = <span class="code-string">"products"</span>, key = <span class="code-string">"#id"</span>)
+    <span class="code-keyword">public</span> Product <span class="code-function">getProduct</span>(Long id) {
+        <span class="code-keyword">return</span> productRepository.findById(id)
+            .orElseThrow(() -&gt; <span class="code-keyword">new</span> NotFoundException(<span class="code-string">"Product not found"</span>));
+    }
+}
+                </div>
+            </div>
+
+            <!-- Section 10: Troubleshooting -->
+            <div class="section" id="troubleshooting">
+                <h2>10. 자주 발생하는 문제 해결</h2>
+
+                <h3>10.1 에이전트 연결 안 됨</h3>
+
+                <div class="warning-box">
+                    <strong>⚠️ 증상</strong><br>
+                    "에이전트를 찾을 수 없습니다" 메시지 표시
+                </div>
+
+                <div class="step-container">
+                    <div class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <strong>에이전트 상태 확인</strong>
+                            <div class="command-box">
+# 에이전트 프로세스 확인
+ps aux | grep ngrinder-agent
+
+# Docker 환경
+docker ps | grep agent
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <strong>네트워크 확인</strong>
+                            <div class="command-box">
+# Controller 포트 확인
+netstat -an | grep 16001
+
+# 방화벽 확인
+sudo ufw status
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <strong>__agent.conf 확인</strong>
+                            <p>Controller의 IP와 포트가 정확한지 확인</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>10.2 OutOfMemoryError 발생</h3>
+
+                <div class="warning-box">
+                    <strong>⚠️ 증상</strong><br>
+                    테스트 중 "java.lang.OutOfMemoryError: Java heap space" 발생
+                </div>
+
+                <div class="code-block" data-lang="bash">
+<span class="code-comment"># Controller Heap 크기 증가</span>
+java -Xms2g -Xmx4g -jar ngrinder-controller.war
+
+<span class="code-comment"># Agent Heap 크기 증가 (run_agent.sh 수정)</span>
+JAVA_OPTS=<span class="code-string">"-Xms1g -Xmx2g"</span>
+
+<span class="code-comment"># Docker 환경</span>
+docker run -e <span class="code-string">"JAVA_OPTS=-Xms2g -Xmx4g"</span> ngrinder/controller
+                </div>
+
+                <h3>10.3 Connection Timeout</h3>
+
+                <div class="code-block" data-lang="groovy">
+<span class="code-comment">// 스크립트에서 타임아웃 설정</span>
+@BeforeProcess
+<span class="code-keyword">public static void</span> <span class="code-function">beforeProcess</span>() {
+    <span class="code-comment">// Connection Timeout: 30초</span>
+    HTTPRequestControl.setConnectionTimeout(<span class="code-number">30000</span>)
+    
+    <span class="code-comment">// Read Timeout: 60초</span>
+    HTTPRequestControl.setTimeout(<span class="code-number">60000</span>)
+}
+                </div>
+
+                <h3>10.4 Docker 환경에서 호스트 접근 불가</h3>
+
+                <div class="code-block" data-lang="groovy">
+<span class="code-comment">// ❌ 작동하지 않음</span>
+request.GET(<span class="code-string">"http://localhost:8080/api"</span>)
+
+<span class="code-comment">// ✅ 올바른 방법</span>
+request.GET(<span class="code-string">"http://host.docker.internal:8080/api"</span>)
+
+<span class="code-comment">// Linux의 경우</span>
+request.GET(<span class="code-string">"http://172.17.0.1:8080/api"</span>)
+                </div>
+
+                <h3>10.5 스크립트 컴파일 오류</h3>
+
+                <div class="info-box">
+                    <strong>💡 해결 방법</strong><br>
+                    1. 스크립트 검증 버튼 클릭하여 문법 오류 확인<br>
+                    2. import 문이 모두 올바른지 확인<br>
+                    3. Groovy 문법에 맞는지 확인 (세미콜론 선택적)<br>
+                    4. 특수문자나 한글이 포함된 경우 UTF-8 인코딩 확인
+                </div>
+
+                <h3>10.6 성능 저하 디버깅</h3>
+
+                <div class="code-block" data-lang="bash">
+<span class="code-comment"># 1. GC 로그 확인</span>
+jstat -gcutil &lt;pid&gt; <span class="code-number">1000</span>
+
+<span class="code-comment"># 2. Thread Dump 생성</span>
+jstack &lt;pid&gt; &gt; thread_dump.txt
+
+<span class="code-comment"># 3. Heap Dump 생성</span>
+jmap -dump:live,format=b,file=heap_dump.hprof &lt;pid&gt;
+
+<span class="code-comment"># 4. 애플리케이션 로그 모니터링</span>
+tail -f application.log | grep <span class="code-string">"ERROR\|WARN"</span>
+
+<span class="code-comment"># 5. DB 슬로우 쿼리 확인</span>
+mysql&gt; SELECT * FROM mysql.slow_log ORDER BY start_time DESC LIMIT <span class="code-number">10</span>;
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="section">
+                <h2>마무리</h2>
+                
+                <p>
+                    이 가이드를 통해 nGrinder의 기본부터 고급 활용법까지 살펴보았습니다. 
+                    성능 테스트는 단순히 도구를 실행하는 것이 아니라, 시스템을 이해하고 
+                    병목 지점을 찾아 개선하는 전체 프로세스입니다.
+                </p>
+
+                <div class="success-box">
+                    <strong>✅ 핵심 요약</strong><br><br>
+                    1. <strong>점진적 접근</strong>: 작은 부하부터 시작하여 단계적으로 증가<br>
+                    2. <strong>현실적인 시나리오</strong>: 실제 사용자 패턴을 반영<br>
+                    3. <strong>종합적인 모니터링</strong>: 애플리케이션, DB, 인프라 모두 관찰<br>
+                    4. <strong>지속적인 개선</strong>: 테스트 → 분석 → 최적화 → 재테스트<br>
+                    5. <strong>문서화</strong>: 테스트 결과와 개선 사항을 기록
+                </div>
+
+                <div class="highlight-box">
+                    <strong>📚 추가 학습 자료</strong><br><br>
+                    • <a href="https://github.com/naver/ngrinder" target="_blank">nGrinder GitHub</a><br>
+                    • <a href="https://github.com/naver/ngrinder/wiki" target="_blank">nGrinder Wiki</a><br>
+                    • <a href="https://naver.github.io/ngrinder/" target="_blank">nGrinder 공식 문서</a><br>
+                    • <a href="https://spring.io/guides/gs/accessing-data-jpa/" target="_blank">Spring Data JPA 가이드</a>
+                </div>
+            </div>
+
+            <!-- Tags -->
+            <div class="tag-container">
+                <span class="tag">#nGrinder</span>
+                <span class="tag">#성능테스트</span>
+                <span class="tag">#LoadTest</span>
+                <span class="tag">#Groovy</span>
+                <span class="tag">#SpringBoot</span>
+                <span class="tag">#JPA</span>
+                <span class="tag">#성능최적화</span>
+                <span class="tag">#DevOps</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="blog-footer">
+            <h3>📬 피드백 & 문의</h3>
+            <p>이 가이드가 도움이 되셨나요? 질문이나 개선 사항이 있다면 언제든지 연락주세요!</p>
+            <p style="margin-top: 20px; opacity: 0.8;">
+                작성: Performance Engineering Team | 
+                최종 수정: 2024년 10월 28일
+            </p>
+        </div>
+    </div>
+</body>
+</html>
