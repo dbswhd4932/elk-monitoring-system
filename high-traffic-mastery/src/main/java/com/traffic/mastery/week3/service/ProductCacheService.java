@@ -43,7 +43,7 @@ public class ProductCacheService {
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
         // Week 1-2와 동일한 처리 시간 시뮬레이션
-        simulateProcessing(50);
+        //simulateProcessing(50);
 
         log.info("✅ [CACHE MISS] DB 조회 완료, Redis에 캐시 저장: productId={}", id);
         return ProductResponse.from(product);
@@ -59,7 +59,7 @@ public class ProductCacheService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
-        simulateProcessing(50);
+        //simulateProcessing(50);
 
         log.info("✅ [NO CACHE] DB 조회 완료: productId={}", id);
         return ProductResponse.from(product);

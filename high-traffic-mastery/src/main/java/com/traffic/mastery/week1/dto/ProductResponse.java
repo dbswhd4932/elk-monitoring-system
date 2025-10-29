@@ -3,10 +3,15 @@ package com.traffic.mastery.week1.dto;
 import com.traffic.mastery.week1.domain.Product;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Getter
 @AllArgsConstructor
-public class ProductResponse {
+@NoArgsConstructor
+public class ProductResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Long id;
     private String name;
     private Integer price;
