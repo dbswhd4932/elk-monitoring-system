@@ -15,6 +15,9 @@
 6. [확장 함수](#6-확장-함수)
 7. [어노테이션 Use-Site Targets (`@field`)](#7-어노테이션-use-site-targets)
 8. [Spring Boot와 함께 사용하기](#8-spring-boot와-함께-사용하기)
+   - [Repository - Optional vs Nullable](#832-optional-vs-nullable---매우-중요)
+   - [Service - 문자열 템플릿](#842-문자열-템플릿-string-templates)
+   - [Service - JPA Dirty Checking](#843-jpa-dirty-checking-변경-감지)
 
 ---
 
@@ -887,6 +890,8 @@ data class Post(
 
 ### 8.3 Repository
 
+#### 8.3.1 기본 사용법
+
 ```kotlin
 interface PostRepository : JpaRepository<Post, Long> {
     // Query Method는 Java와 동일
@@ -897,7 +902,65 @@ interface PostRepository : JpaRepository<Post, Long> {
 }
 ```
 
+#### 8.3.2 Optional vs Nullable - 매우 중요!
+
+**문제 상황:**
+
+```kotlin
+// ❌ 이렇게 하면 안 됩니다!
+val post = postRepository.findById(id)
+    ?: throw IllegalArgumentException("...")  // 컴파일 에러는 없지만 작동 안함!
+```
+
+**왜 안 될까요?**
+
+```kotlin
+// findById()는 Optional<Post>를 반환
+postRepository.findById(id)  // 타입: Optional<Post>
+
+// Optional은 절대 null이 아닙니다!
+// 빈 Optional도 객체이므로 Elvis 연산자(?:)가 작동하지 않음
+```
+
+**해결 방법:**
+
+```kotlin
+// 방법 1: orElseThrow() 사용 (Java 스타일)
+val post = postRepository.findById(id)
+    .orElseThrow { IllegalArgumentException("게시글을 찾을 수 없습니다. id: $id") }
+
+// 방법 2: orElse(null) + Elvis (코틀린 스타일)
+val post = postRepository.findById(id).orElse(null)
+    ?: throw IllegalArgumentException("게시글을 찾을 수 없습니다. id: $id")
+
+// 방법 3: findByIdOrNull() 확장 함수 (가장 코틀린다움!) ✅ 추천
+val post = postRepository.findByIdOrNull(id)
+    ?: throw IllegalArgumentException("게시글을 찾을 수 없습니다. id: $id")
+```
+
+**비교표:**
+
+| 메서드 | 반환 타입 | Elvis 연산자 | 추천도 |
+|--------|-----------|--------------|--------|
+| `findById(id)` | `Optional<Post>` | ❌ 사용 불가 | Java 호환 |
+| `findById(id).orElse(null)` | `Post?` | ✅ 사용 가능 | 🤔 |
+| `findByIdOrNull(id)` | `Post?` | ✅ 사용 가능 | ⭐ 추천 |
+
+**핵심 요약:**
+
+```kotlin
+// Java Optional과 Kotlin nullable은 다릅니다!
+Optional.empty()  // null이 아님! 빈 Optional 객체
+null              // null
+
+// 따라서
+Optional.empty() ?: "default"  // ❌ 작동 안함 (Optional은 null이 아니므로)
+null ?: "default"              // ✅ "default" 반환
+```
+
 ### 8.4 Service
+
+#### 8.4.1 기본 구조
 
 ```kotlin
 @Service
@@ -920,6 +983,105 @@ class PostService(
     }
 }
 ```
+
+#### 8.4.2 문자열 템플릿 (String Templates)
+
+**Java 방식 (연결 연산자):**
+```java
+throw new IllegalArgumentException("게시글을 찾을 수 없습니다. id: " + id);
+```
+
+**Kotlin 방식 (문자열 템플릿):**
+```kotlin
+// ❌ Java 스타일 (작동은 하지만 권장하지 않음)
+throw IllegalArgumentException("게시글을 찾을 수 없습니다. id: " + id)
+
+// ✅ Kotlin 스타일 (문자열 템플릿 사용)
+throw IllegalArgumentException("게시글을 찾을 수 없습니다. id: $id")
+
+// 표현식도 가능
+throw IllegalArgumentException("게시글을 찾을 수 없습니다. id: ${id}, user: ${user.name}")
+```
+
+**문자열 템플릿 규칙:**
+
+```kotlin
+val name = "John"
+val age = 30
+
+// 단순 변수: $변수명
+println("Name: $name")  // "Name: John"
+
+// 표현식: ${표현식}
+println("Age: ${age + 1}")  // "Age: 31"
+println("Name length: ${name.length}")  // "Name length: 4"
+
+// 프로퍼티 접근
+println("User: ${user.name}, Email: ${user.email}")
+```
+
+#### 8.4.3 JPA Dirty Checking (변경 감지)
+
+**중요: Kotlin도 Java와 동일하게 Dirty Checking이 작동합니다!**
+
+**Java:**
+```java
+@Transactional
+public PostResponse updatePost(Long id, UpdatePostRequest request) {
+    Post post = postRepository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다"));
+
+    // Dirty Checking을 통한 업데이트
+    post.update(request.getTitle(), request.getContent());
+
+    // ✅ save() 호출 불필요! 트랜잭션 종료 시 자동 UPDATE
+    return PostResponse.from(post);
+}
+```
+
+**Kotlin (동일한 동작):**
+```kotlin
+@Transactional
+fun updatePost(id: Long, request: UpdatePostRequest): PostResponse {
+    val post = postRepository.findByIdOrNull(id)
+        ?: throw IllegalArgumentException("게시글을 찾을 수 없습니다. id: $id")
+
+    // Dirty Checking을 통한 업데이트
+    post.update(request.title, request.content)
+
+    // ✅ save() 호출 불필요! 트랜잭션 종료 시 자동 UPDATE
+    return PostResponse.from(post)
+}
+```
+
+**Dirty Checking 작동 조건:**
+
+1. ✅ `@Transactional` 어노테이션 존재
+2. ✅ Repository에서 조회한 **영속 상태** 엔티티
+3. ✅ 엔티티의 필드 변경 (`var` 프로퍼티)
+4. ✅ 트랜잭션 커밋 시점에 자동 UPDATE
+
+**잘못된 예:**
+
+```kotlin
+@Transactional
+fun updatePost(id: Long, request: UpdatePostRequest): PostResponse {
+    val post = postRepository.findByIdOrNull(id)
+        ?: throw IllegalArgumentException("...")
+
+    post.update(request.title, request.content)
+
+    // ❌ 불필요한 save() 호출 (중복 UPDATE 쿼리 가능성)
+    val savedPost = postRepository.save(post)
+
+    return PostResponse.from(savedPost)
+}
+```
+
+**핵심:**
+- JPA의 Dirty Checking은 **언어와 무관**
+- Kotlin이든 Java든 **동일한 JPA 메커니즘** 사용
+- `@Transactional` + 영속 엔티티 수정 = 자동 UPDATE
 
 ### 8.5 Controller
 

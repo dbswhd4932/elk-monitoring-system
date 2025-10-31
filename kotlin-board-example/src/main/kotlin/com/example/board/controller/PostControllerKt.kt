@@ -2,6 +2,7 @@ package com.example.board.controller
 
 import com.example.board.dto.PostDtoKt
 import com.example.board.service.PostServiceKt
+import jakarta.validation.Valid
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
@@ -51,6 +52,30 @@ class PostControllerKt(
         val response = postServiceKt.searchPost(keyword, pageable)
 
         return ResponseEntity.ok(response)
+    }
+
+    // 게시글 생성
+    @PostMapping
+    fun createPost(@Valid @RequestBody request: PostDtoKt.CreatePostRequest): ResponseEntity<PostDtoKt.PostResponse> {
+        val response = postServiceKt.createPost(request)
+        return ResponseEntity.ok(response)
+    }
+
+    // 게시글 수정
+    @PutMapping("/{id}")
+    fun updatePost(
+        @PathVariable id: Long,
+        @Valid @RequestBody request: PostDtoKt.UpdatePostRequest
+    ): ResponseEntity<PostDtoKt.PostResponse> {
+        val response = postServiceKt.updatePost(id, request)
+        return ResponseEntity.ok(response)
+    }
+
+    // 게시글 삭제
+    @DeleteMapping("/{id}")
+    fun deletePost(@PathVariable id: Long): ResponseEntity<Unit> {
+        postServiceKt.deletePost(id)
+        return ResponseEntity.noContent().build()
     }
 
 
