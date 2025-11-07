@@ -31,7 +31,7 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
-        log.info("GET /api/users - Fetching all users");
+        log.info("GET /api/users - 전체 사용자 조회");
         List<UserResponse> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
@@ -42,7 +42,7 @@ public class UserController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-        log.info("GET /api/users/{} - Fetching user by id", id);
+        log.info("GET /api/users/{} - 사용자 조회", id);
         UserResponse user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
@@ -53,7 +53,7 @@ public class UserController {
      */
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
-        log.info("POST /api/users - Creating new user");
+        log.info("POST /api/users - 신규 사용자 생성");
         UserResponse user = userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
@@ -66,7 +66,7 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
             @Valid @RequestBody UserRequest request) {
-        log.info("PUT /api/users/{} - Updating user", id);
+        log.info("PUT /api/users/{} - 사용자 수정", id);
         UserResponse user = userService.updateUser(id, request);
         return ResponseEntity.ok(user);
     }
@@ -77,7 +77,7 @@ public class UserController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        log.info("DELETE /api/users/{} - Deleting user", id);
+        log.info("DELETE /api/users/{} - 사용자 삭제", id);
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
@@ -90,7 +90,7 @@ public class UserController {
     public ResponseEntity<UserResponse> changeUserStatus(
             @PathVariable Long id,
             @RequestParam User.UserStatus status) {
-        log.info("PATCH /api/users/{}/status - Changing user status to {}", id, status);
+        log.info("PATCH /api/users/{}/status - 사용자 상태 변경: {}", id, status);
         UserResponse user = userService.changeUserStatus(id, status);
         return ResponseEntity.ok(user);
     }
@@ -101,7 +101,7 @@ public class UserController {
      */
     @GetMapping("/test/error")
     public ResponseEntity<Void> simulateError() {
-        log.info("GET /api/users/test/error - Simulating error");
+        log.info("GET /api/users/test/error - 에러 시뮬레이션");
         userService.simulateError();
         return ResponseEntity.ok().build();
     }

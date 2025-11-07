@@ -36,7 +36,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
         MDC.put(USER_ID, "anonymous");
 
         // 요청 정보 로깅
-        log.info("HTTP Request - Method: {}, URI: {}, IP: {}",
+        log.info("HTTP 요청 - 메서드: {}, URI: {}, IP: {}",
                 request.getMethod(),
                 request.getRequestURI(),
                 clientIp);
@@ -48,7 +48,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
                                 Object handler, Exception ex) {
         // 응답 정보 로깅
-        log.info("HTTP Response - Status: {}, URI: {}",
+        log.info("HTTP 응답 - 상태: {}, URI: {}",
                 response.getStatus(),
                 request.getRequestURI());
 

@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBusinessException(
             BusinessException ex, WebRequest request) {
 
-        log.warn("Business Exception occurred: {} - {}",
+        log.warn("비즈니스 예외 발생 - 코드: {}, 메시지: {}",
                 ex.getErrorCode(),
                 ex.getMessage());
 
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
         errorContext.put("exception_type", ex.getClass().getSimpleName());
         errorContext.put("path", request.getDescription(false));
 
-        log.error("Unexpected exception occurred: {}", ex.getMessage(), ex);
+        log.error("예상치 못한 예외 발생: {}", ex.getMessage(), ex);
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
             IllegalArgumentException ex, WebRequest request) {
 
-        log.warn("Invalid argument: {}", ex.getMessage());
+        log.warn("잘못된 인자: {}", ex.getMessage());
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())

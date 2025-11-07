@@ -35,14 +35,14 @@ public class UserService {
     public List<UserResponse> getAllUsers() {
         long startTime = System.currentTimeMillis();
 
-        log.info("Fetching all users");
+        log.info("전체 사용자 조회 시작");
         List<User> users = userRepository.findAll();
 
         long duration = System.currentTimeMillis() - startTime;
         Map<String, Object> metadata = new HashMap<>();
         metadata.put("user_count", users.size());
 
-        LoggingUtils.logPerformance(log, "fetch_all_users", duration, metadata);
+        LoggingUtils.logPerformance(log, "전체_사용자_조회", duration, metadata);
 
         return users.stream()
                 .map(UserResponse::from)
@@ -53,19 +53,19 @@ public class UserService {
      * ID로 사용자 조회
      */
     public UserResponse getUserById(Long id) {
-        log.debug("Fetching user by id: {}", id);
+        log.debug("사용자 조회 - ID: {}", id);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("User not found with id: {}", id);
+                    log.warn("사용자를 찾을 수 없음 - ID: {}", id);
                     return new BusinessException(
-                            "User not found with id: " + id,
+                            "사용자를 찾을 수 없습니다: " + id,
                             "USER_NOT_FOUND",
                             HttpStatus.NOT_FOUND
                     );
                 });
 
-        log.info("User found: {}", user.getEmail());
+        log.info("사용자 조회 성공 - 이메일: {}", user.getEmail());
         return UserResponse.from(user);
     }
 
@@ -74,13 +74,13 @@ public class UserService {
      */
     @Transactional
     public UserResponse createUser(UserRequest request) {
-        log.info("Creating new user with email: {}", request.getEmail());
+        log.info("신규 사용자 생성 시작 - 이메일: {}", request.getEmail());
 
         // 이메일 중복 체크
         if (userRepository.existsByEmail(request.getEmail())) {
-            log.warn("Email already exists: {}", request.getEmail());
+            log.warn("이메일 중복 - 이메일: {}", request.getEmail());
             throw new BusinessException(
-                    "Email already exists: " + request.getEmail(),
+                    "이미 존재하는 이메일입니다: " + request.getEmail(),
                     "DUPLICATE_EMAIL",
                     HttpStatus.CONFLICT
             );
@@ -96,9 +96,9 @@ public class UserService {
         eventData.put("user_name", savedUser.getName());
         eventData.put("user_status", savedUser.getStatus().name());
 
-        LoggingUtils.logBusinessEvent(log, "user_created", eventData);
+        LoggingUtils.logBusinessEvent(log, "사용자_생성", eventData);
 
-        log.info("User created successfully with id: {}", savedUser.getId());
+        log.info("사용자 생성 완료 - ID: {}", savedUser.getId());
         return UserResponse.from(savedUser);
     }
 
@@ -107,11 +107,11 @@ public class UserService {
      */
     @Transactional
     public UserResponse updateUser(Long id, UserRequest request) {
-        log.info("Updating user with id: {}", id);
+        log.info("사용자 수정 시작 - ID: {}", id);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(
-                        "User not found with id: " + id,
+                        "사용자를 찾을 수 없습니다: " + id,
                         "USER_NOT_FOUND",
                         HttpStatus.NOT_FOUND
                 ));
@@ -119,9 +119,9 @@ public class UserService {
         // 이메일 변경 시 중복 체크
         if (!user.getEmail().equals(request.getEmail()) &&
                 userRepository.existsByEmail(request.getEmail())) {
-            log.warn("Email already exists: {}", request.getEmail());
+            log.warn("이메일 중복 - 이메일: {}", request.getEmail());
             throw new BusinessException(
-                    "Email already exists: " + request.getEmail(),
+                    "이미 존재하는 이메일입니다: " + request.getEmail(),
                     "DUPLICATE_EMAIL",
                     HttpStatus.CONFLICT
             );
@@ -138,9 +138,9 @@ public class UserService {
         eventData.put("user_id", updatedUser.getId());
         eventData.put("user_email", updatedUser.getEmail());
 
-        LoggingUtils.logBusinessEvent(log, "user_updated", eventData);
+        LoggingUtils.logBusinessEvent(log, "사용자_수정", eventData);
 
-        log.info("User updated successfully with id: {}", updatedUser.getId());
+        log.info("사용자 수정 완료 - ID: {}", updatedUser.getId());
         return UserResponse.from(updatedUser);
     }
 
@@ -149,11 +149,11 @@ public class UserService {
      */
     @Transactional
     public void deleteUser(Long id) {
-        log.info("Deleting user with id: {}", id);
+        log.info("사용자 삭제 시작 - ID: {}", id);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(
-                        "User not found with id: " + id,
+                        "사용자를 찾을 수 없습니다: " + id,
                         "USER_NOT_FOUND",
                         HttpStatus.NOT_FOUND
                 ));
@@ -165,9 +165,9 @@ public class UserService {
         eventData.put("user_id", id);
         eventData.put("user_email", user.getEmail());
 
-        LoggingUtils.logBusinessEvent(log, "user_deleted", eventData);
+        LoggingUtils.logBusinessEvent(log, "사용자_삭제", eventData);
 
-        log.info("User deleted successfully with id: {}", id);
+        log.info("사용자 삭제 완료 - ID: {}", id);
     }
 
     /**
@@ -175,11 +175,11 @@ public class UserService {
      */
     @Transactional
     public UserResponse changeUserStatus(Long id, User.UserStatus newStatus) {
-        log.info("Changing user status - userId: {}, newStatus: {}", id, newStatus);
+        log.info("사용자 상태 변경 시작 - ID: {}, 새 상태: {}", id, newStatus);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(
-                        "User not found with id: " + id,
+                        "사용자를 찾을 수 없습니다: " + id,
                         "USER_NOT_FOUND",
                         HttpStatus.NOT_FOUND
                 ));
@@ -195,9 +195,9 @@ public class UserService {
         eventData.put("old_status", oldStatus.name());
         eventData.put("new_status", newStatus.name());
 
-        LoggingUtils.logBusinessEvent(log, "user_status_changed", eventData);
+        LoggingUtils.logBusinessEvent(log, "사용자_상태변경", eventData);
 
-        log.info("User status changed successfully - userId: {}", id);
+        log.info("사용자 상태 변경 완료 - ID: {}", id);
         return UserResponse.from(updatedUser);
     }
 
@@ -205,17 +205,17 @@ public class UserService {
      * 의도적인 에러 발생 (테스트용)
      */
     public void simulateError() {
-        log.warn("Simulating an error for testing purposes");
+        log.warn("테스트용 에러 시뮬레이션 시작");
 
         try {
             // 의도적으로 예외 발생
-            throw new RuntimeException("This is a simulated error for ELK testing");
+            throw new RuntimeException("ELK 테스트를 위한 시뮬레이션 에러입니다");
         } catch (Exception e) {
             Map<String, Object> errorContext = new HashMap<>();
-            errorContext.put("error_type", "simulated");
+            errorContext.put("error_type", "시뮬레이션");
             errorContext.put("test_purpose", true);
 
-            LoggingUtils.logError(log, "Simulated error occurred", e, errorContext);
+            LoggingUtils.logError(log, "시뮬레이션 에러 발생", e, errorContext);
             throw e;
         }
     }

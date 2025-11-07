@@ -1,0 +1,287 @@
+### ELK Monitoring System - API 테스트
+### IntelliJ, VS Code (REST Client 확장), 또는 기타 HTTP 클라이언트에서 사용 가능
+
+### 변수 설정
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+###############################################
+### 1. 헬스 체크
+###############################################
+
+### 헬스 체크
+GET {{baseUrl}}/health
+
+###############################################
+### 2. 사용자 조회
+###############################################
+
+### 전체 사용자 조회
+GET {{baseUrl}}/api/users
+
+### 특정 사용자 조회 (ID: 1)
+GET {{baseUrl}}/api/users/1
+
+### 특정 사용자 조회 (ID: 2)
+GET {{baseUrl}}/api/users/2
+
+### 존재하지 않는 사용자 조회 (404 에러 테스트)
+GET {{baseUrl}}/api/users/9999
+
+###############################################
+### 3. 사용자 생성
+###############################################
+
+### 사용자 생성 - 홍길동
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "name": "홍길동",
+  "email": "hong@example.com",
+  "phone": "010-1234-5678"
+}
+
+### 사용자 생성 - 김철수
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "name": "김철수",
+  "email": "kim@example.com",
+  "phone": "010-2222-3333"
+}
+
+### 사용자 생성 - 이영희
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "name": "이영희",
+  "email": "lee@example.com",
+  "phone": "010-4444-5555"
+}
+
+### 사용자 생성 - 박민수
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "name": "박민수",
+  "email": "park@example.com",
+  "phone": "010-6666-7777"
+}
+
+### 중복 이메일 테스트 (409 Conflict 에러)
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "name": "중복테스트",
+  "email": "hong@example.com",
+  "phone": "010-9999-9999"
+}
+
+### 잘못된 이메일 형식 (400 Bad Request)
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "name": "테스트",
+  "email": "invalid-email",
+  "phone": "010-1111-2222"
+}
+
+### 필수 필드 누락 (400 Bad Request)
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "name": "테스트"
+}
+
+###############################################
+### 4. 사용자 수정
+###############################################
+
+### 사용자 수정 (ID: 1)
+PUT {{baseUrl}}/api/users/1
+Content-Type: {{contentType}}
+
+{
+  "name": "홍길동(수정)",
+  "email": "hong.updated@example.com",
+  "phone": "010-9876-5432"
+}
+
+### 사용자 수정 (ID: 2)
+PUT {{baseUrl}}/api/users/2
+Content-Type: {{contentType}}
+
+{
+  "name": "김철수(수정)",
+  "email": "kim.updated@example.com",
+  "phone": "010-8888-9999"
+}
+
+###############################################
+### 5. 사용자 상태 변경
+###############################################
+
+### 사용자 상태 변경 - SUSPENDED (ID: 1)
+PATCH {{baseUrl}}/api/users/1/status?status=SUSPENDED
+
+### 사용자 상태 변경 - INACTIVE (ID: 2)
+PATCH {{baseUrl}}/api/users/2/status?status=INACTIVE
+
+### 사용자 상태 변경 - ACTIVE (ID: 1)
+PATCH {{baseUrl}}/api/users/1/status?status=ACTIVE
+
+###############################################
+### 6. 사용자 삭제
+###############################################
+
+### 사용자 삭제 (ID: 3)
+DELETE {{baseUrl}}/api/users/3
+
+### 사용자 삭제 (ID: 4)
+DELETE {{baseUrl}}/api/users/4
+
+###############################################
+### 7. 에러 테스트
+###############################################
+
+### 에러 시뮬레이션 (500 Internal Server Error)
+GET {{baseUrl}}/api/users/test/error
+
+###############################################
+### 8. 시나리오 테스트
+###############################################
+
+### 시나리오 1: 사용자 생성 → 조회 → 수정 → 상태변경 → 삭제
+
+# Step 1: 사용자 생성
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "name": "시나리오테스트",
+  "email": "scenario@example.com",
+  "phone": "010-0000-0000"
+}
+
+###
+
+# Step 2: 생성된 사용자 조회 (위에서 받은 ID 사용, 예: 5)
+GET {{baseUrl}}/api/users/5
+
+###
+
+# Step 3: 사용자 정보 수정
+PUT {{baseUrl}}/api/users/5
+Content-Type: {{contentType}}
+
+{
+  "name": "시나리오테스트(수정완료)",
+  "email": "scenario.updated@example.com",
+  "phone": "010-1111-1111"
+}
+
+###
+
+# Step 4: 상태 변경
+PATCH {{baseUrl}}/api/users/5/status?status=INACTIVE
+
+###
+
+# Step 5: 전체 사용자 목록에서 확인
+GET {{baseUrl}}/api/users
+
+###
+
+# Step 6: 사용자 삭제
+DELETE {{baseUrl}}/api/users/5
+
+###
+
+# Step 7: 삭제 확인 (404 에러 발생해야 함)
+GET {{baseUrl}}/api/users/5
+
+###############################################
+### 9. 로그 생성용 대량 요청
+###############################################
+
+### 다양한 로그 생성 (INFO, DEBUG, WARN, ERROR)
+
+# 1. 정상 사용자 생성 (INFO 로그)
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "name": "로그테스트1",
+  "email": "log1@example.com",
+  "phone": "010-1111-0001"
+}
+
+###
+
+# 2. 정상 사용자 생성 (INFO 로그)
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "name": "로그테스트2",
+  "email": "log2@example.com",
+  "phone": "010-1111-0002"
+}
+
+###
+
+# 3. 중복 이메일 (WARN 로그)
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "name": "중복",
+  "email": "log1@example.com",
+  "phone": "010-2222-0001"
+}
+
+###
+
+# 4. 존재하지 않는 사용자 조회 (WARN 로그)
+GET {{baseUrl}}/api/users/999
+
+###
+
+# 5. 에러 시뮬레이션 (ERROR 로그)
+GET {{baseUrl}}/api/users/test/error
+
+###
+
+# 6. 전체 조회 (INFO + Performance 로그)
+GET {{baseUrl}}/api/users
+
+###############################################
+### 사용 방법
+###############################################
+
+# IntelliJ IDEA:
+# - 파일을 열고 각 요청 옆의 ▶ 버튼 클릭
+# - 또는 요청에 커서를 놓고 Ctrl+Enter (Mac: Cmd+Enter)
+
+# VS Code (REST Client 확장 설치 필요):
+# - Extension: humao.rest-client 설치
+# - 파일을 열고 "Send Request" 클릭
+
+# 기타 HTTP 클라이언트:
+# - 각 섹션을 복사하여 사용
+
+###############################################
+### 팁
+###############################################
+
+# 1. 사용자 ID는 요청 응답에서 확인하여 사용하세요
+# 2. 중복 이메일 테스트 시 먼저 해당 이메일로 사용자를 생성하세요
+# 3. Kibana에서 실시간으로 로그 확인: http://localhost:5601
+# 4. Elasticsearch에서 로그 검색: http://localhost:9200/application-logs-*/_search
