@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: openfeign-example
+
+# User Service 프로필
+---
+spring:
+  config:
+    activate:
+      on-profile: user-service
+server:
+  port: 8080
+
+logging:
+  level:
+    com.example.openfeign: DEBUG
+
+# Order Service 프로필
+---
+spring:
+  config:
+    activate:
+      on-profile: order-service
+server:
+  port: 8081
+
+# User Service URL 설정
+user:
+  service:
+    url: http://localhost:8080
+
+# Feign 로깅 설정
+logging:
+  level:
+    com.example.openfeign: DEBUG
+    com.example.openfeign.order.UserClient: DEBUG
+
+# Feign 설정
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: full
