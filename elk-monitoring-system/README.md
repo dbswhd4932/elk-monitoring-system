@@ -138,6 +138,7 @@ elk-monitoring-system/
 - **Docker & Docker Compose**: 설치 필요
 - **Java**: 17 이상
 - **포트**: 3306, 5044, 8080, 9200, 9300, 5601, 9600 사용 가능
+- **Slack Webhook URL** (선택): 에러 알림을 받으려면 필요
 
 ### 설치 및 실행
 
@@ -146,12 +147,31 @@ elk-monitoring-system/
 cd elk-monitoring-system
 ```
 
-#### 2. Docker 서비스 시작
+#### 2. Slack 알림 설정 (선택)
+
+ERROR 로그 발생 시 Slack 알림을 받으려면:
+
+1. Slack Webhook URL 생성
+   - https://api.slack.com/messaging/webhooks 접속
+   - "Create your Slack app" 클릭
+   - "Incoming Webhooks" 활성화
+   - Webhook URL 복사
+
+2. 환경 변수 설정
+```bash
+# .env 파일 생성
+cp .env.example .env
+
+# .env 파일 편집하여 Webhook URL 입력
+# SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+```
+
+#### 3. Docker 서비스 시작
 ```bash
 docker-compose up -d
 ```
 
-#### 3. 서비스 확인
+#### 4. 서비스 확인
 ```bash
 # Elasticsearch 상태 확인
 curl http://localhost:9200/_cluster/health?pretty
@@ -160,7 +180,7 @@ curl http://localhost:9200/_cluster/health?pretty
 curl http://localhost:5601/api/status
 ```
 
-#### 4. Spring Boot 애플리케이션 실행
+#### 5. Spring Boot 애플리케이션 실행
 ```bash
 ./gradlew bootRun
 ```
@@ -170,7 +190,7 @@ curl http://localhost:5601/api/status
 ./start.sh
 ```
 
-#### 5. API 테스트
+#### 6. API 테스트
 ```bash
 # 헬스 체크
 curl http://localhost:8080/health
@@ -180,12 +200,22 @@ curl -X POST http://localhost:8080/api/users \
   -H "Content-Type: application/json" \
   -d '{"name":"홍길동","email":"hong@example.com","phone":"010-1234-5678"}'
 
+# 에러 로그 생성 (Slack 알림 테스트)
+curl http://localhost:8080/api/users/test/error
+
 # 로그 생성 스크립트 실행
 ./generate-logs.sh
 ```
 
-#### 6. Kibana에서 로그 확인
+#### 7. Kibana에서 로그 확인
 브라우저에서 http://localhost:5601 접속
+
+#### 8. Slack에서 알림 확인
+ERROR 로그가 발생하면 Slack 채널에 다음과 같은 알림이 전송됩니다:
+- Application 정보 (elk-monitoring-system 또는 shoppingmall)
+- 에러 발생 시각
+- Logger 이름
+- 에러 메시지
 
 ## 주요 엔드포인트
 
@@ -259,6 +289,27 @@ curl -X POST http://localhost:8080/api/users \
 
 ## 모니터링 및 알림
 
+### Slack 알림 (Logstash HTTP Output Plugin)
+
+ERROR 레벨 로그 발생 시 실시간으로 Slack 알림이 전송됩니다.
+
+**알림 내용:**
+- 에러 발생 애플리케이션 (태그 기반)
+- 에러 발생 시각
+- Logger 이름
+- 로그 레벨
+- 에러 메시지
+
+**장점:**
+- 실시간 알림 (로그 발생 즉시)
+- 설정이 간단함
+- 애플리케이션 코드 수정 불필요
+
+**주의사항:**
+- 모든 ERROR 로그마다 알림이 전송됩니다
+- 대량의 에러 발생 시 알림이 많을 수 있습니다
+- 필요 시 filter에서 특정 조건으로 제한 가능
+
 ### Kibana 대시보드
 
 1. http://localhost:5601 접속
@@ -266,11 +317,6 @@ curl -X POST http://localhost:8080/api/users \
 3. 시각화 및 대시보드 구성
 
 자세한 내용은 [KIBANA_GUIDE.md](./KIBANA_GUIDE.md) 참조
-
-### 알림 규칙
-
-- **High Error Rate**: 5분간 에러 로그 5개 이상 발생 시
-- **Business Event Failure**: 비즈니스 이벤트 실패 시
 
 ## 학습 포인트
 

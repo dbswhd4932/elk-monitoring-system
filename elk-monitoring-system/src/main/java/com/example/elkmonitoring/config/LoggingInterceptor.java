@@ -20,6 +20,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
     private static final String REQUEST_ID = "requestId";
     private static final String USER_ID = "userId";
     private static final String CLIENT_IP = "clientIp";
+    private static final String API_PATH = "api_path";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -30,6 +31,10 @@ public class LoggingInterceptor implements HandlerInterceptor {
         // 클라이언트 IP 추출
         String clientIp = getClientIp(request);
         MDC.put(CLIENT_IP, clientIp);
+
+        // API 경로 추가 (메서드 + URI)
+        String apiPath = request.getMethod() + " " + request.getRequestURI();
+        MDC.put(API_PATH, apiPath);
 
         // 사용자 ID (실제로는 인증 정보에서 추출)
         // 현재는 예제를 위해 하드코딩
